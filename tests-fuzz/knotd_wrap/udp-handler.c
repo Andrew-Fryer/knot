@@ -82,7 +82,12 @@ static void udp_stdin_handle(udp_context_t *ctx, void *d)
 
 static void udp_stdin_send(void *d)
 {
+	printf("andrew: in udp_stdin_send\n");
 	udp_stdin_t *rq = (udp_stdin_t *)d;
+	// write(3, "andrew: buf 0:\n", 15);
+	// write(3, rq->iov[0].iov_base, rq->iov[0].iov_len);
+	// write(3, "andrew: buf 1:\n", 15);
+	write(3, rq->iov[1].iov_base, rq->iov[1].iov_len);
 	next(rq);
 }
 

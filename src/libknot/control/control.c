@@ -253,6 +253,7 @@ int knot_ctl_accept(knot_ctl_t *ctx)
 	knot_ctl_close(ctx);
 
 	// Control interface.
+	ctx->listen_sock = 0;
 	struct pollfd pfd = { .fd = ctx->listen_sock, .events = POLLIN };
 	int ret = poll(&pfd, 1, ACCEPT_TIMEOUT);
 	if (ret <= 0) {

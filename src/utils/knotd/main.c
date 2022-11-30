@@ -385,6 +385,8 @@ int main(int argc, char **argv)
 	const char *daemon_root = "/";
 	char *socket = NULL;
 	bool verbose = false;
+	FILE* output_file;
+	int output_fd;
 
 	/* Long options. */
 	struct option opts[] = {
@@ -392,6 +394,7 @@ int main(int argc, char **argv)
 		{ "confdb",        required_argument, NULL, 'C' },
 		{ "max-conf-size", required_argument, NULL, 'm' },
 		{ "socket",        required_argument, NULL, 's' },
+		{ "outputFile",        required_argument, NULL, '0' },
 		{ "daemonize",     optional_argument, NULL, 'd' },
 		{ "verbose",       no_argument,       NULL, 'v' },
 		{ "help",          no_argument,       NULL, 'h' },
@@ -404,7 +407,7 @@ int main(int argc, char **argv)
 
 	/* Parse command line arguments. */
 	int opt = 0;
-	while ((opt = getopt_long(argc, argv, "c:C:m:s:dvhV", opts, NULL)) != -1) {
+	while ((opt = getopt_long(argc, argv, "c:C:m:s:o:dvhV", opts, NULL)) != -1) {
 		switch (opt) {
 		case 'c':
 			config = optarg;
@@ -422,6 +425,11 @@ int main(int argc, char **argv)
 			break;
 		case 's':
 			socket = optarg;
+			break;
+		case 'o':
+			output_file = fopen(optarg, "w");
+			output_fd = fileno(output_file);
+            printf("Setting output_file %s to fd %d\n", optarg, output_fd);
 			break;
 		case 'd':
 			daemonize = true;
