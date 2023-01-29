@@ -28,11 +28,15 @@ typedef struct {
 
 static inline void next(udp_stdin_t *rq)
 {
-	if (rq->afl_persistent) {
-		raise(SIGSTOP);
-	} else {
-		exit(0);
-	}
+	exit(0);
+	// printf("this is running\n");
+	// return;
+	// printf("this is not running\n");
+	// if (rq->afl_persistent) {
+	// 	raise(SIGSTOP);
+	// } else {
+	// 	exit(0);
+	// }
 }
 
 static void *udp_stdin_init(_unused_ udp_context_t *ctx, _unused_ void *xdp_sock)
@@ -68,6 +72,7 @@ static int udp_stdin_recv(_unused_ int fd, void *d)
 	rq->iov[RX].iov_len = fread(rq->iov[RX].iov_base, 1,
 	                            KNOT_WIRE_MAX_PKTSIZE, stdin);
 	if (rq->iov[RX].iov_len == 0) {
+		printf("andrew: this shouldn't be happening (if our input file isn't empty)\n");
 		next(rq);
 	}
 

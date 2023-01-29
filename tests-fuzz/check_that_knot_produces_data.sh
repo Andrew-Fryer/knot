@@ -1,0 +1,1 @@
+time for j in 0 1 2 3 4 5 6 7 8 9; do for i in 0 1 2 3 4 5 6 7 8 9; do cat ./in/packet/bind-systemtest-7726aff5f05f.pkt | ./knotd_stdio -c ./knotd_wrap/knot_stdio.conf -o output > /dev/null 2>@1; if [ -s output ]; then echo "full"; else echo "empty"; fi; done; done;

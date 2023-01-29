@@ -44,6 +44,8 @@
 #include "knot/server/server.h"
 #include "knot/server/tcp-handler.h"
 
+#include <unistd.h>
+
 #define PROGRAM_NAME "knotd"
 
 /* Signal flags. */
@@ -295,6 +297,10 @@ static void event_loop(server_t *server, const char *socket)
 	/* Unbind the control socket. */
 	knot_ctl_unbind(ctl);
 	knot_ctl_free(ctl);
+
+	// this gives the background threads time to finish their work
+	printf("waiting for a bit\n");
+	usleep(100 * 1000); // 100 milliseconds
 }
 
 static void print_help(void)
