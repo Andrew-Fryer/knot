@@ -301,7 +301,7 @@ int zone_events_setup(struct zone *zone, worker_pool_t *workers,
 	}
 
 	event_t *event;
-	event = evsched_event_create(scheduler, event_dispatch, &zone->events);
+	event = evsched_event_create(scheduler, event_dispatch, &zone->events); // this is the only spot I can find where we create an event
 	if (!event) {
 		return KNOT_ENOMEM;
 	}

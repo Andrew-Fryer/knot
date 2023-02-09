@@ -471,7 +471,7 @@ static unsigned udp_set_ifaces(const server_t *server, size_t n_ifaces, fdset_t 
 	return fdset_get_length(fds);
 }
 
-int udp_master(dthread_t *thread)
+int udp_master(dthread_t *thread) // this is the third thread that is run
 {
 	if (thread == NULL || thread->data == NULL) {
 		return KNOT_EINVAL;
@@ -554,6 +554,7 @@ int udp_master(dthread_t *thread)
 			if (!fdset_it_is_pollin(&it)) {
 				continue;
 			}
+			// this is where we process requests
 			if (api->udp_recv(fdset_it_get_fd(&it), api_ctx) > 0) {
 				api->udp_handle(&udp, api_ctx);
 				api->udp_send(api_ctx);

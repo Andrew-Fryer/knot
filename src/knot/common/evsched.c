@@ -60,7 +60,7 @@ static struct timeval timeval_in(uint32_t dt)
 }
 
 /*! \brief Event scheduler loop. */
-static int evsched_run(dthread_t *thread)
+static int evsched_run(dthread_t *thread) // the first thread run is this
 {
 	evsched_t *sched = (evsched_t*)thread->data;
 	if (sched == NULL) {
@@ -109,7 +109,7 @@ int evsched_init(evsched_t *sched, void *ctx)
 	pthread_cond_init(&sched->notify, 0);
 	heap_init(&sched->heap, compare_event_heap_nodes, 0);
 
-	sched->thread = dt_create(1, evsched_run, NULL, sched);
+	sched->thread = dt_create(1, evsched_run, NULL, sched); // this is where we spin up the scheduler thread
 
 	if (sched->thread == NULL) {
 		evsched_deinit(sched);

@@ -757,6 +757,7 @@ static int server_init_handler(server_t *server, int index, int thread_count,
                                runnable_t runnable, runnable_t destructor)
 {
 	/* Initialize */
+	// I think this is where we spin up the threads
 	iohandler_t *h = &server->handlers[index].handler;
 	memset(h, 0, sizeof(iohandler_t));
 	h->server = server;

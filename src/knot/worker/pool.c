@@ -48,7 +48,7 @@ struct worker_pool {
  * An execution of a running thread cannot be enforced.
  *
  */
-static int worker_main(dthread_t *thread)
+static int worker_main(dthread_t *thread) // this is the second thread run
 {
 	assert(thread);
 

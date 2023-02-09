@@ -18,7 +18,7 @@
 #include "knot/server/tcp-handler.c"
 #undef tcp_master
 
-int tcp_master(dthread_t *thread)
+int tcp_master(dthread_t *thread) // this is the fourth thread that is run
 {
 	log_info("AFL, empty TCP handler");
 	return 0;
