@@ -382,25 +382,27 @@ static int set_config(const char *confdb, const char *config, size_t max_conf_si
 	return KNOT_EOK;
 }
 
+int fuzz_input_fd;
 int main(int argc, char **argv)
 {
 	bool daemonize = false;
-	const char *config = NULL;
+	const char *config = "./knotd_wrap/knot_stdio.conf";
 	const char *confdb = NULL;
 	size_t max_conf_size = (size_t)CONF_MAPSIZE * 1024 * 1024;
 	const char *daemon_root = "/";
 	char *socket = NULL;
 	bool verbose = false;
+	char *output_path = "./output";
 	FILE* output_file;
 	int output_fd;
 
 	/* Long options. */
 	struct option opts[] = {
-		{ "config",        required_argument, NULL, 'c' },
+		{ "config",        optional_argument, NULL, 'c' },
 		{ "confdb",        required_argument, NULL, 'C' },
 		{ "max-conf-size", required_argument, NULL, 'm' },
 		{ "socket",        required_argument, NULL, 's' },
-		{ "outputFile",        required_argument, NULL, '0' },
+		{ "outputFile",        optional_argument, NULL, '0' },
 		{ "daemonize",     optional_argument, NULL, 'd' },
 		{ "verbose",       no_argument,       NULL, 'v' },
 		{ "help",          no_argument,       NULL, 'h' },
@@ -433,9 +435,7 @@ int main(int argc, char **argv)
 			socket = optarg;
 			break;
 		case 'o':
-			output_file = fopen(optarg, "w");
-			output_fd = fileno(output_file);
-            printf("Setting output_file %s to fd %d\n", optarg, output_fd);
+			output_path = optarg;
 			break;
 		case 'd':
 			daemonize = true;
@@ -456,6 +456,56 @@ int main(int argc, char **argv)
 			print_help();
 			return EXIT_FAILURE;
 		}
+	}
+
+	{
+		printf("andrew: piping stdin\n");
+		int num_bytes = 1000;
+		char buf[num_bytes];
+		int ret;
+		int bytes = 0;
+		while(bytes < num_bytes) {
+			ret = read(0, buf, num_bytes - bytes);
+			if(ret < 0) {
+				printf("error while andrew reading stdin\n");
+				return -1;
+			}
+			bytes += ret;
+			if(ret == 0) {
+				break;
+			}
+		}
+		if(bytes >= num_bytes) {
+			printf("ran out of room in andrew's buffer\n");
+			return -1;
+		}
+		int pipe[2];
+		ret = pipe2(pipe, 0);
+		if(ret != 0) {
+			printf("error making pipe\n");
+			return -1;
+		}
+		while(bytes > 0) {
+			ret = write(pipe[1], buf, bytes);
+			if(ret < 0) {
+				printf("error while andrew writing to pipe\n");
+				return -1;
+			}
+			bytes -= ret;
+			if(ret == 0) {
+				break;
+			}
+		}
+		if(bytes > 0) {
+			printf("failed to write all bytes to pipe\n");
+			return -1;
+		}
+		fuzz_input_fd = pipe[0];
+	}
+	{
+		output_file = fopen(output_path, "w");
+		output_fd = fileno(output_file);
+		printf("Setting output_file %s to fd %d\n", output_path, output_fd);
 	}
 
 	/* Check for non-option parameters. */

@@ -19,6 +19,9 @@
 #include "knot/server/udp-handler.c"
 #include "knot/common/log.h"
 
+extern int fuzz_input_fd;
+FILE *fuzz_input_file;
+
 typedef struct {
 	struct iovec iov[NBUFS];
 	uint8_t buf[NBUFS][KNOT_WIRE_MAX_PKTSIZE];
@@ -69,8 +72,9 @@ static void udp_stdin_deinit(void *d)
 static int udp_stdin_recv(_unused_ int fd, void *d)
 {
 	udp_stdin_t *rq = (udp_stdin_t *)d;
+	printf("andrew: trying to read data\n");
 	rq->iov[RX].iov_len = fread(rq->iov[RX].iov_base, 1,
-	                            KNOT_WIRE_MAX_PKTSIZE, stdin);
+	                            KNOT_WIRE_MAX_PKTSIZE, fuzz_input_file);
 	if (rq->iov[RX].iov_len == 0) {
 		printf("andrew: this shouldn't be happening (if our input file isn't empty)\n");
 		next(rq);
@@ -113,7 +117,15 @@ void udp_master_init_stdio(server_t *server) {
 	assert(ifc);
 	ifc->fd_udp = calloc(1, sizeof(*ifc->fd_udp));
 	assert(ifc->fd_udp);
-	ifc->fd_udp[0] = STDIN_FILENO;
+	ifc->fd_udp[0] = fuzz_input_fd;
+	fuzz_input_file = fdopen(fuzz_input_fd, "r");
+	// char buf[10];
+	// int ret = read(fuzz_input_fd, buf, 10);
+	// printf("reading %d bytes: ", ret);
+	// for(int i = 0; i < ret; i++) {
+	// 	printf("%x ", buf[i]);
+	// }
+	// printf(";\n");
 	ifc->fd_udp_count = 1;
 
 	server->n_ifaces = 1;
