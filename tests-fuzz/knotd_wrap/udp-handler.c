@@ -31,9 +31,9 @@ typedef struct {
 
 static inline void next(udp_stdin_t *rq)
 {
-	exit(0);
-	// printf("this is running\n");
-	// return;
+	// exit(0);
+	printf("andrew: returning from next\n");
+	return;
 	// printf("this is not running\n");
 	// if (rq->afl_persistent) {
 	// 	raise(SIGSTOP);
