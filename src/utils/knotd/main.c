@@ -383,6 +383,7 @@ static int set_config(const char *confdb, const char *config, size_t max_conf_si
 }
 
 int fuzz_input_fd;
+int fuzz_output_fd;
 int main(int argc, char **argv)
 {
 	bool daemonize = false;
@@ -393,8 +394,6 @@ int main(int argc, char **argv)
 	char *socket = NULL;
 	bool verbose = false;
 	char *output_path = "./output";
-	FILE* output_file;
-	int output_fd;
 
 	/* Long options. */
 	struct option opts[] = {
@@ -459,6 +458,12 @@ int main(int argc, char **argv)
 	}
 
 	{
+		// Here, we copy the contents of stdin to a buffer,
+		// then create a pipe, then copy the buffer into the pipe,
+		// and then assign `fuzz_input_fd` to the pipe output.
+		// In udp-handler.c, we read from `fuzz_input_fd`.
+		// This song and dance means that Knot doesn't explode
+		// when it tries to use `epoll` on `stdin` or now `fuzz_input_fd`.
 		printf("andrew: piping stdin\n");
 		int num_bytes = 1000;
 		char buf[num_bytes];
@@ -503,9 +508,10 @@ int main(int argc, char **argv)
 		fuzz_input_fd = pipe[0];
 	}
 	{
+		FILE* output_file;
 		output_file = fopen(output_path, "w");
-		output_fd = fileno(output_file);
-		printf("Setting output_file %s to fd %d\n", output_path, output_fd);
+		fuzz_output_fd = fileno(output_file);
+		printf("Setting output_file %s to fd %d\n", output_path, fuzz_output_fd);
 	}
 
 	/* Check for non-option parameters. */
