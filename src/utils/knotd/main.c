@@ -256,8 +256,10 @@ static void event_loop(server_t *server, const char *socket)
 		systemd_emit_running(true);
 	}
 
+	printf("outside event loop\n");
 	/* Run event loop. */
 	for (;;) {
+		printf("inside event loop\n");
 		/* Interrupts. */
 		if (sig_req_reload && !sig_req_stop) {
 			sig_req_reload = false;
@@ -299,8 +301,12 @@ static void event_loop(server_t *server, const char *socket)
 	knot_ctl_free(ctl);
 
 	// this gives the background threads time to finish their work
-	printf("waiting for a bit\n");
-	usleep(100 * 1000); // 100 milliseconds
+	// printf("waiting for a bit\n");
+	// usleep(100 * 1000); // 100 milliseconds
+	// The reason I need the sleep here is that __AFL_LOOP() is returning zero
+	// because I'm compiling with afl-clang rather than afl-clang-fast,
+	// so __AFL_LOOP is not defined by the compiler (see afl-cc.c line 1172)
+	// so it defaults to returning 0 in afl-loop.h.
 }
 
 static void print_help(void)

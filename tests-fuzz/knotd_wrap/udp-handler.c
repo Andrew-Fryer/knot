@@ -33,14 +33,16 @@ typedef struct {
 static inline void next(udp_stdin_t *rq)
 {
 	// exit(0);
-	printf("andrew: returning from next\n");
-	return;
+	// printf("andrew: returning from next\n");
+	// return;
 	// printf("this is not running\n");
-	// if (rq->afl_persistent) {
-	// 	raise(SIGSTOP);
-	// } else {
-	// 	exit(0);
-	// }
+	if (rq->afl_persistent) {
+		printf("raising SIGSTOP\n");
+		raise(SIGSTOP);
+	} else {
+		printf("exiting\n");
+		exit(0);
+	}
 }
 
 static void *udp_stdin_init(_unused_ udp_context_t *ctx, _unused_ void *xdp_sock)
@@ -95,6 +97,8 @@ static void udp_stdin_send(void *d)
 	printf("andrew: in udp_stdin_send\n");
 	udp_stdin_t *rq = (udp_stdin_t *)d;
 	write(fuzz_output_fd, rq->iov[1].iov_base, rq->iov[1].iov_len);
+	// exit(0); // I want this to stop all of Knot
+	// raise(SIGSTOP); should pause the process (all of Knot) to be resumed later
 	next(rq);
 }
 

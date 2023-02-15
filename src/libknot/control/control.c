@@ -255,6 +255,7 @@ int knot_ctl_accept(knot_ctl_t *ctx)
 	// Control interface.
 	ctx->listen_sock = 0;
 	struct pollfd pfd = { .fd = ctx->listen_sock, .events = POLLIN };
+	printf("knot ctl polling fd %d\n", pfd.fd);
 	int ret = poll(&pfd, 1, ACCEPT_TIMEOUT);
 	if (ret <= 0) {
 		return (ret == 0) ? KNOT_ETIMEOUT : knot_map_errno();

@@ -17,5 +17,8 @@
 #pragma once
 
 #ifndef __AFL_LOOP
-#define __AFL_LOOP(x) (0)
+#define __AFL_LOOP(x) (asdf)
 #endif
+
+// I have verified that this is used when we compile with afl-clang.
+// I have verified that this is not used when we compile with /home/afryer/msc/LibAFL/fuzzers/forkserver_simple/AFLplusplus/afl-clang-fast
