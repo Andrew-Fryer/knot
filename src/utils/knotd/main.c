@@ -465,55 +465,58 @@ int main(int argc, char **argv)
 		}
 	}
 
+	// {
+	// 	// Here, we copy the contents of stdin to a buffer,
+	// 	// then create a pipe, then copy the buffer into the pipe,
+	// 	// and then assign `fuzz_input_fd` to the pipe output.
+	// 	// In udp-handler.c, we read from `fuzz_input_fd`.
+	// 	// This song and dance means that Knot doesn't explode
+	// 	// when it tries to use `epoll` on `stdin` or now `fuzz_input_fd`.
+	// 	printf("andrew: piping stdin\n");
+	// 	int num_bytes = 1000;
+	// 	char buf[num_bytes];
+	// 	int ret;
+	// 	int bytes = 0;
+	// 	while(bytes < num_bytes) {
+	// 		ret = read(0, buf, num_bytes - bytes);
+	// 		if(ret < 0) {
+	// 			printf("error while andrew reading stdin\n");
+	// 			return -1;
+	// 		}
+	// 		bytes += ret;
+	// 		if(ret == 0) {
+	// 			break;
+	// 		}
+	// 	}
+	// 	if(bytes >= num_bytes) {
+	// 		printf("ran out of room in andrew's buffer\n");
+	// 		return -1;
+	// 	}
+	// 	int pipe[2];
+	// 	ret = pipe2(pipe, 0);
+	// 	if(ret != 0) {
+	// 		printf("error making pipe\n");
+	// 		return -1;
+	// 	}
+	// 	while(bytes > 0) {
+	// 		ret = write(pipe[1], buf, bytes);
+	// 		if(ret < 0) {
+	// 			printf("error while andrew writing to pipe\n");
+	// 			return -1;
+	// 		}
+	// 		bytes -= ret;
+	// 		if(ret == 0) {
+	// 			break;
+	// 		}
+	// 	}
+	// 	if(bytes > 0) {
+	// 		printf("failed to write all bytes to pipe\n");
+	// 		return -1;
+	// 	}
+	// 	fuzz_input_fd = pipe[0];
+	// }
 	{
-		// Here, we copy the contents of stdin to a buffer,
-		// then create a pipe, then copy the buffer into the pipe,
-		// and then assign `fuzz_input_fd` to the pipe output.
-		// In udp-handler.c, we read from `fuzz_input_fd`.
-		// This song and dance means that Knot doesn't explode
-		// when it tries to use `epoll` on `stdin` or now `fuzz_input_fd`.
-		printf("andrew: piping stdin\n");
-		int num_bytes = 1000;
-		char buf[num_bytes];
-		int ret;
-		int bytes = 0;
-		while(bytes < num_bytes) {
-			ret = read(0, buf, num_bytes - bytes);
-			if(ret < 0) {
-				printf("error while andrew reading stdin\n");
-				return -1;
-			}
-			bytes += ret;
-			if(ret == 0) {
-				break;
-			}
-		}
-		if(bytes >= num_bytes) {
-			printf("ran out of room in andrew's buffer\n");
-			return -1;
-		}
-		int pipe[2];
-		ret = pipe2(pipe, 0);
-		if(ret != 0) {
-			printf("error making pipe\n");
-			return -1;
-		}
-		while(bytes > 0) {
-			ret = write(pipe[1], buf, bytes);
-			if(ret < 0) {
-				printf("error while andrew writing to pipe\n");
-				return -1;
-			}
-			bytes -= ret;
-			if(ret == 0) {
-				break;
-			}
-		}
-		if(bytes > 0) {
-			printf("failed to write all bytes to pipe\n");
-			return -1;
-		}
-		fuzz_input_fd = pipe[0];
+		fuzz_input_fd = 0;
 	}
 	{
 		FILE* output_file;
@@ -624,7 +627,8 @@ int main(int argc, char **argv)
 	                      &conf()->query_plan);
 
 	/* Check and create PID file. */
-	unsigned long pid = pid_check_and_create();
+	// unsigned long pid = pid_check_and_create();
+	unsigned long pid = getpid();
 	if (pid == 0) {
 		server_wait(&server);
 		server_deinit(&server);
