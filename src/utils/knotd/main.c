@@ -390,10 +390,19 @@ static int set_config(const char *confdb, const char *config, size_t max_conf_si
 	return KNOT_EOK;
 }
 
+// __AFL_FUZZ_INIT();
+
 int fuzz_input_fd;
 int fuzz_output_fd;
 int main(int argc, char **argv)
 {
+
+	// printf("before afl init\n");
+	// // #ifdef __AFL_HAVE_MANUAL_CONTROL
+	// __AFL_INIT();
+	// // #endif
+	// printf("after afl init\n");
+
 	bool daemonize = false;
 	const char *config = "./knotd_wrap/knot_stdio.conf";
 	const char *confdb = NULL;

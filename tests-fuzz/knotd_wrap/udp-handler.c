@@ -33,18 +33,15 @@ typedef struct {
 static inline void next(udp_stdin_t *rq)
 {
 	// exit(0);
-	// printf("andrew: returning from next\n");
-	// return;
-	// printf("this is not running\n");
-	// printf("andrew: returning from next\n");
-	// return;
-	if (rq->afl_persistent) {
-		printf("raising SIGSTOP\n");
-		raise(SIGSTOP);
-	} else {
-		printf("exiting\n");
-		exit(0);
-	}
+	printf("andrew: returning from next\n");
+	return;
+	// if (rq->afl_persistent) {
+	// 	printf("raising SIGSTOP\n");
+	// 	raise(SIGSTOP);
+	// } else {
+	// 	printf("exiting\n");
+	// 	exit(0);
+	// }
 }
 
 static void *udp_stdin_init(_unused_ udp_context_t *ctx, _unused_ void *xdp_sock)

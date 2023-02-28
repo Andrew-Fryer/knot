@@ -658,7 +658,7 @@ int server_init(server_t *server, int bg_workers)
 	memset(server, 0, sizeof(server_t));
 
 	/* Initialize event scheduler. */
-	if (evsched_init(&server->sched, server) != KNOT_EOK) {
+	if (evsched_init(&server->sched, server) != KNOT_EOK) { // I should try commenting this and see if we still get dns output
 		return KNOT_ENOMEM;
 	}
 
