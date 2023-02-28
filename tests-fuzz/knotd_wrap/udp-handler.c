@@ -36,13 +36,15 @@ static inline void next(udp_stdin_t *rq)
 	// printf("andrew: returning from next\n");
 	// return;
 	// printf("this is not running\n");
-	if (rq->afl_persistent) {
-		printf("raising SIGSTOP\n");
-		raise(SIGSTOP);
-	} else {
-		printf("exiting\n");
-		exit(0);
-	}
+	printf("andrew: returning from next\n");
+	return;
+	// if (rq->afl_persistent) {
+	// 	printf("raising SIGSTOP\n");
+	// 	raise(SIGSTOP);
+	// } else {
+	// 	printf("exiting\n");
+	// 	exit(0);
+	// }
 }
 
 static void *udp_stdin_init(_unused_ udp_context_t *ctx, _unused_ void *xdp_sock)
@@ -76,8 +78,11 @@ static int udp_stdin_recv(_unused_ int fd, void *d)
 {
 	udp_stdin_t *rq = (udp_stdin_t *)d;
 	printf("andrew: trying to read data\n");
-	rq->iov[RX].iov_len = fread(rq->iov[RX].iov_base, 1,
-	                            KNOT_WIRE_MAX_PKTSIZE, fuzz_input_file);
+	printf("andrew: trying to read data: %d\n", fd);
+	rq->iov[RX].iov_len = read(fuzz_input_fd, rq->iov[RX].iov_base, 1000);
+	// rq->iov[RX].iov_len = fread(rq->iov[RX].iov_base, 1,
+	//                             KNOT_WIRE_MAX_PKTSIZE, fuzz_input_file);
+	printf("andrew: read data\n");
 	if (rq->iov[RX].iov_len == 0) {
 		printf("andrew: this shouldn't be happening (if our input file isn't empty)\n");
 		next(rq);

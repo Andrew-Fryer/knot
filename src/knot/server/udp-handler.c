@@ -1,3 +1,4 @@
+#include "../../../tests-fuzz/knotd_wrap/afl-loop.h"
 /*  Copyright (C) 2022 CZ.NIC, z.s.p.o. <knot-dns@labs.nic.cz>
 
     This program is free software: you can redistribute it and/or modify
@@ -539,7 +540,10 @@ int udp_master(dthread_t *thread) // this is the third thread that is run
 	}
 
 	/* Loop until all data is read. */
-	for (;;) {
+	printf("outside event loop\n");
+	// for (;;) {
+	while (__AFL_LOOP(10000)) {
+		printf("inside event loop\n");
 		/* Cancellation point. */
 		if (dt_is_cancelled(thread)) {
 			break;

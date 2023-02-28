@@ -208,101 +208,103 @@ static void drop_capabilities(void)
 /*! \brief Event loop listening for signals and remote commands. */
 static void event_loop(server_t *server, const char *socket)
 {
-	knot_ctl_t *ctl = knot_ctl_alloc();
-	if (ctl == NULL) {
-		log_fatal("control, failed to initialize (%s)",
-		          knot_strerror(KNOT_ENOMEM));
-		return;
-	}
+	// knot_ctl_t *ctl = knot_ctl_alloc();
+	// if (ctl == NULL) {
+	// 	log_fatal("control, failed to initialize (%s)",
+	// 	          knot_strerror(KNOT_ENOMEM));
+	// 	return;
+	// }
 
-	// Set control timeout.
-	knot_ctl_set_timeout(ctl, conf()->cache.ctl_timeout);
+	// // Set control timeout.
+	// knot_ctl_set_timeout(ctl, conf()->cache.ctl_timeout);
 
-	/* Get control socket configuration. */
-	char *listen;
-	if (socket == NULL) {
-		conf_val_t listen_val = conf_get(conf(), C_CTL, C_LISTEN);
-		conf_val_t rundir_val = conf_get(conf(), C_SRV, C_RUNDIR);
-		char *rundir = conf_abs_path(&rundir_val, NULL);
-		listen = conf_abs_path(&listen_val, rundir);
-		free(rundir);
-	} else {
-		listen = strdup(socket);
-	}
-	if (listen == NULL) {
-		knot_ctl_free(ctl);
-		log_fatal("control, empty socket path");
-		return;
-	}
+	// /* Get control socket configuration. */
+	// char *listen;
+	// if (socket == NULL) {
+	// 	conf_val_t listen_val = conf_get(conf(), C_CTL, C_LISTEN);
+	// 	conf_val_t rundir_val = conf_get(conf(), C_SRV, C_RUNDIR);
+	// 	char *rundir = conf_abs_path(&rundir_val, NULL);
+	// 	listen = conf_abs_path(&listen_val, rundir);
+	// 	free(rundir);
+	// } else {
+	// 	listen = strdup(socket);
+	// }
+	// if (listen == NULL) {
+	// 	knot_ctl_free(ctl);
+	// 	log_fatal("control, empty socket path");
+	// 	return;
+	// }
 
-	log_info("control, binding to '%s'", listen);
+	// log_info("control, binding to '%s'", listen);
 
-	/* Bind the control socket. */
-	int ret = knot_ctl_bind(ctl, listen);
-	if (ret != KNOT_EOK) {
-		knot_ctl_free(ctl);
-		log_fatal("control, failed to bind socket '%s' (%s)",
-		          listen, knot_strerror(ret));
-		free(listen);
-		return;
-	}
-	free(listen);
+	// /* Bind the control socket. */
+	// int ret = knot_ctl_bind(ctl, listen);
+	// if (ret != KNOT_EOK) {
+	// 	knot_ctl_free(ctl);
+	// 	log_fatal("control, failed to bind socket '%s' (%s)",
+	// 	          listen, knot_strerror(ret));
+	// 	free(listen);
+	// 	return;
+	// }
+	// free(listen);
 
 	enable_signals();
 
-	/* Notify systemd about successful start. */
-	systemd_ready_notify();
-	if (conf()->cache.srv_dbus_event & DBUS_EVENT_RUNNING) {
-		systemd_emit_running(true);
-	}
+	// /* Notify systemd about successful start. */
+	// systemd_ready_notify();
+	// if (conf()->cache.srv_dbus_event & DBUS_EVENT_RUNNING) {
+	// 	systemd_emit_running(true);
+	// }
 
-	printf("outside event loop\n");
-	/* Run event loop. */
-	for (;;) {
-		printf("inside event loop\n");
-		/* Interrupts. */
-		if (sig_req_reload && !sig_req_stop) {
-			sig_req_reload = false;
-			server_reload(server);
-		}
-		if (sig_req_zones_reload && !sig_req_stop) {
-			sig_req_zones_reload = false;
-			server_update_zones(conf(), server);
-		}
-		if (sig_req_stop) {
-			break;
-		}
+	// // printf("outside event loop\n");
+	// /* Run event loop. */
+	// for (;;) {
+	// 	// printf("inside event loop\n");
+	// 	/* Interrupts. */
+	// 	if (sig_req_reload && !sig_req_stop) {
+	// 		sig_req_reload = false;
+	// 		server_reload(server);
+	// 	}
+	// 	if (sig_req_zones_reload && !sig_req_stop) {
+	// 		sig_req_zones_reload = false;
+	// 		server_update_zones(conf(), server);
+	// 	}
+	// 	if (sig_req_stop) {
+	// 		break;
+	// 	}
 
-		// Update control timeout.
-		knot_ctl_set_timeout(ctl, conf()->cache.ctl_timeout);
+	// 	// Update control timeout.
+	// 	knot_ctl_set_timeout(ctl, conf()->cache.ctl_timeout);
 
-		if (sig_req_reload || sig_req_zones_reload) {
-			continue;
-		}
+	// 	if (sig_req_reload || sig_req_zones_reload) {
+	// 		continue;
+	// 	}
 
-		ret = knot_ctl_accept(ctl);
-		if (ret != KNOT_EOK) {
-			continue;
-		}
+	// 	ret = knot_ctl_accept(ctl);
+	// 	if (ret != KNOT_EOK) {
+	// 		continue;
+	// 	}
 
-		ret = ctl_process(ctl, server);
-		knot_ctl_close(ctl);
-		if (ret == KNOT_CTL_ESTOP) {
-			break;
-		}
-	}
+	// 	ret = ctl_process(ctl, server);
+	// 	knot_ctl_close(ctl);
+	// 	if (ret == KNOT_CTL_ESTOP) {
+	// 		break;
+	// 	}
+	// }
 
-	if (conf()->cache.srv_dbus_event & DBUS_EVENT_RUNNING) {
-		systemd_emit_running(false);
-	}
+	// if (conf()->cache.srv_dbus_event & DBUS_EVENT_RUNNING) {
+	// 	systemd_emit_running(false);
+	// }
 
-	/* Unbind the control socket. */
-	knot_ctl_unbind(ctl);
-	knot_ctl_free(ctl);
+	// /* Unbind the control socket. */
+	// knot_ctl_unbind(ctl);
+	// knot_ctl_free(ctl);
 
 	// this gives the background threads time to finish their work
-	// printf("waiting for a bit\n");
-	// usleep(100 * 1000); // 100 milliseconds
+	while(1) {
+		printf("main thread waiting for a bit\n");
+		usleep(1 * 1000 * 1000); // 1 second
+	}
 	// The reason I need the sleep here is that __AFL_LOOP() is returning zero
 	// because I'm compiling with afl-clang rather than afl-clang-fast,
 	// so __AFL_LOOP is not defined by the compiler (see afl-cc.c line 1172)
