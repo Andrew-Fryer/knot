@@ -542,7 +542,8 @@ int udp_master(dthread_t *thread) // this is the third thread that is run
 	/* Loop until all data is read. */
 	printf("outside event loop\n");
 	// for (;;) {
-	while (__AFL_LOOP(10000)) {
+	printf("__AFL_PERSISTENT is %s\n", getenv("__AFL_PERSISTENT"));
+	while (__AFL_LOOP(10)) {
 		printf("inside event loop\n");
 		/* Cancellation point. */
 		if (dt_is_cancelled(thread)) {
@@ -570,6 +571,8 @@ int udp_master(dthread_t *thread) // this is the third thread that is run
 			api->udp_sweep(api_ctx);
 		}
 	}
+	// I think I should kill everything here to emulate return 0 in the main c function in the afl persistent example
+	raise(SIGKILL);
 
 finish:
 	api->udp_deinit(api_ctx);

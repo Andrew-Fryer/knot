@@ -129,6 +129,7 @@ static const struct signal SIGNALS[] = {
 /*! \brief Server signal handler. */
 static void handle_signal(int signum)
 {
+	printf("Handling Signal %d\n", signum);
 	switch (signum) {
 	case SIGHUP:
 		sig_req_reload = true;
@@ -137,6 +138,9 @@ static void handle_signal(int signum)
 		sig_req_zones_reload = true;
 		break;
 	case SIGINT:
+		// raise(SIGKILL);
+		// break;
+		printf("Recieved SIGINT\n");
 	case SIGTERM:
 		if (sig_req_stop) {
 			exit(EXIT_FAILURE);

@@ -94,11 +94,16 @@ static void udp_stdin_handle(udp_context_t *ctx, void *d)
 	udp_handle(ctx, STDIN_FILENO, &rq->addr, &rq->iov[RX], &rq->iov[TX], false);
 }
 
+int num_sent;
 static void udp_stdin_send(void *d)
 {
-	printf("andrew: in udp_stdin_send\n");
+	printf("andrew: in udp_stdin_send, (%d)\n", num_sent);
+	num_sent += 1;
 	udp_stdin_t *rq = (udp_stdin_t *)d;
 	write(fuzz_output_fd, rq->iov[1].iov_base, rq->iov[1].iov_len);
+	if(rq->iov[1].iov_len) {
+		printf("andrew: writing non-empty output data\n");
+	}
 	// exit(0); // I want this to stop all of Knot
 	// raise(SIGSTOP); should pause the process (all of Knot) to be resumed later
 	next(rq);
@@ -115,6 +120,7 @@ static udp_api_t stdin_api = {
 void udp_master_init_stdio(server_t *server) {
 
 	log_info("AFL, UDP handler listening on stdin");
+	num_sent = 0;
 
 	// Register dummy interface to server.
 	iface_t *ifc = calloc(1, sizeof(*ifc));
