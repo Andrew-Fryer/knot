@@ -33,7 +33,7 @@ typedef struct {
 static inline void next(udp_stdin_t *rq)
 {
 	// exit(0);
-	printf("andrew: returning from next\n");
+	// printf("andrew: returning from next\n");
 	return;
 	// if (rq->afl_persistent) {
 	// 	printf("raising SIGSTOP\n");
@@ -74,12 +74,12 @@ static void udp_stdin_deinit(void *d)
 static int udp_stdin_recv(_unused_ int fd, void *d)
 {
 	udp_stdin_t *rq = (udp_stdin_t *)d;
-	printf("andrew: trying to read data\n");
-	printf("andrew: trying to read data: %d\n", fd);
+	// printf("andrew: trying to read data\n");
+	// printf("andrew: trying to read data: %d\n", fd);
 	rq->iov[RX].iov_len = read(fuzz_input_fd, rq->iov[RX].iov_base, 1000);
 	// rq->iov[RX].iov_len = fread(rq->iov[RX].iov_base, 1,
 	//                             KNOT_WIRE_MAX_PKTSIZE, fuzz_input_file);
-	printf("andrew: read data\n");
+	// printf("andrew: read data\n");
 	if (rq->iov[RX].iov_len == 0) {
 		printf("andrew: this shouldn't be happening (if our input file isn't empty)\n");
 		next(rq);
@@ -97,7 +97,7 @@ static void udp_stdin_handle(udp_context_t *ctx, void *d)
 int num_sent;
 static void udp_stdin_send(void *d)
 {
-	printf("andrew: in udp_stdin_send, (%d)\n", num_sent);
+	// printf("andrew: in udp_stdin_send, (%d)\n", num_sent);
 	num_sent += 1;
 	udp_stdin_t *rq = (udp_stdin_t *)d;
 	write(fuzz_output_fd, rq->iov[1].iov_base, rq->iov[1].iov_len);

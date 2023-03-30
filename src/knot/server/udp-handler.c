@@ -540,11 +540,11 @@ int udp_master(dthread_t *thread) // this is the third thread that is run
 	}
 
 	/* Loop until all data is read. */
-	printf("outside event loop\n");
+	// printf("outside event loop\n");
 	// for (;;) {
-	printf("__AFL_PERSISTENT is %s\n", getenv("__AFL_PERSISTENT"));
-	while (__AFL_LOOP(10)) {
-		printf("inside event loop\n");
+	// printf("__AFL_PERSISTENT is %s\n", getenv("__AFL_PERSISTENT"));
+	while (__AFL_LOOP(10000)) {
+		// printf("inside event loop\n");
 		/* Cancellation point. */
 		if (dt_is_cancelled(thread)) {
 			break;
