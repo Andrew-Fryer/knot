@@ -572,7 +572,7 @@ int udp_master(dthread_t *thread) // this is the third thread that is run
 		}
 	}
 	// I think I should kill everything here to emulate return 0 in the main c function in the afl persistent example
-	raise(SIGKILL); // Dr. Dean says try `exit(0)`
+	exit(0);
 
 finish:
 	api->udp_deinit(api_ctx);
