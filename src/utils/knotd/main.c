@@ -414,7 +414,7 @@ int main(int argc, char **argv)
 	const char *daemon_root = "/";
 	char *socket = NULL;
 	bool verbose = false;
-	char *output_path = "./output";
+	char *output_path = "./.cur_output";
 
 	/* Long options. */
 	struct option opts[] = {

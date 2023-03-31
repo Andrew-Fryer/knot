@@ -100,9 +100,32 @@ static void udp_stdin_send(void *d)
 	// printf("andrew: in udp_stdin_send, (%d)\n", num_sent);
 	num_sent += 1;
 	udp_stdin_t *rq = (udp_stdin_t *)d;
-	write(fuzz_output_fd, rq->iov[1].iov_base, rq->iov[1].iov_len);
+
+
+	// FILE* output_file;
+	// output_file = fopen("./.cur_output", "w");
+	// int fuzz_output_fd = fileno(output_file);
+	int ftruncate_result = ftruncate(fuzz_output_fd, 0);
+	if(ftruncate_result) {
+		printf("failed to truncate file\n");
+	}
+	int bytes_written = write(fuzz_output_fd, rq->iov[1].iov_base, rq->iov[1].iov_len);
+	// int fflush_result = fflush(fuzz_output_fd);
+	// if(fflush_result) {
+	// 	printf("andrew: failed to fflush\n");
+	// }
+	// int close_result = close(fuzz_output_fd);
+	// if(close_result) {
+	// 	printf("andrew: failed to close file\n");
+	// }
+
+	if(bytes_written != rq->iov[1].iov_len) {
+		printf("andrew: only wrote %d / %lu bytes\n", bytes_written, rq->iov[1].iov_len);
+	}
 	if(rq->iov[1].iov_len) {
 		printf("andrew: writing non-empty output data\n");
+	} else {
+		printf("andrew: writing empty output data\n");
 	}
 	// exit(0); // I want this to stop all of Knot
 	// raise(SIGSTOP); should pause the process (all of Knot) to be resumed later
