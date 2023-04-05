@@ -125,7 +125,7 @@ static void udp_stdin_send(void *d)
 	if(rq->iov[1].iov_len) {
 		printf("andrew: writing non-empty output data\n");
 	} else {
-		printf("andrew: writing empty output data\n");
+		// printf("andrew: writing empty output data\n");
 	}
 	// exit(0); // I want this to stop all of Knot
 	// raise(SIGSTOP); should pause the process (all of Knot) to be resumed later
