@@ -17,7 +17,7 @@
 #pragma once
 
 #ifndef __AFL_LOOP
-#define __AFL_LOOP(x) (asdf)
+#define __AFL_LOOP(x) (fprintf(stderr, "__AFL_LOOP has not been defined\n") && 0)
 #endif
 
 // I have verified that this is used when we compile with afl-clang.
